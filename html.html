@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Jogo do Equilíbrio</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      min-height: 100vh;
+      width: 100vw;
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(180deg, #7c3aed 0%, #0f1724 100%);
+      color: #e6eef8;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100vw;
+      min-height: 100vh;
+      padding: 0;
+      background: rgba(11,18,32,0.98);
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 2.5fr;
+      grid-template-rows: 1fr;
+      gap: 0 32px;
+      width: 100vw;
+      max-width: 1400px;
+      height: 100vh;
+      box-sizing: border-box;
+      padding: 16px 0 0 0;
+    }
+    .painel-lateral {
+      background: rgba(124,58,237,0.08);
+      border-radius: 14px;
+      padding: 18px 12px 18px 18px;
+      min-width: 220px;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 2px 12px rgba(124,58,237,0.10);
+      height: fit-content;
+      box-sizing: border-box;
+      justify-content: flex-start;
+      align-self: flex-start;
+    }
+    .painel-lateral h2 {
+      color: #7c3aed;
+      font-size: 1.18rem;
+      margin: 0 0 8px 0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-align: left;
+    }
+    .painel-lateral .dica {
+      color: #ef4444;
+      font-weight: 600;
+      margin-top: 8px;
+      display: none;
+    }
+    .painel-lateral .tutorial {
+      background: #fffbe7;
+      color: #7c3aed;
+      border-radius: 8px;
+      padding: 10px 8px;
+      margin-top: 8px;
+      font-size: 0.98rem;
+      display: none;
+    }
+    .painel-lateral button {
+      margin-top: 8px;
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(124,58,237,0.10);
+      transition: background 0.2s;
+    }
+    .painel-lateral button:hover {
+      background: #5b21b6;
+    }
+    .controls-area {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 10px;
+      margin-bottom: 0;
+      flex-wrap: wrap;
+    }
+    .control-group {
+      background: rgba(124,58,237,0.07);
+      border-radius: 10px;
+      padding: 10px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 120px;
+      max-width: 160px;
+      box-shadow: 0 2px 8px rgba(124,58,237,0.06);
+      flex: 1 1 120px;
+    }
+    label {
+      font-size: 1rem;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #7c3aed;
+      margin-bottom: 2px;
+    }
+    .value {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #7c3aed;
+      text-align: right;
+      margin-bottom: 4px;
+    }
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-width: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0 0 0 0;
+    }
+    h1 {
+      font-size: 2rem;
+      margin: 0 0 8px 0;
+      color: #7c3aed;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .challenge {
+      background: #fffde7;
+      color: #222;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 8px rgba(124,58,237,0.04);
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      max-width: 90%;
+    }
+    .simulador-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      background: rgba(255,255,255,0.01);
+      border-radius: 18px;
+      box-sizing: border-box;
+      padding: 18px 0 0 0;
+      margin-bottom: 0;
+    }
+    .balance-canvas {
+      background: #f8fafc;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(124,58,237,0.08);
+      margin-bottom: 0;
+      border: 2px solid #7c3aed22;
+      width: 1000px;
+      height: 320px;
+      max-width: 98vw;
+      max-height: 48vh;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .simulador-infos {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin-top: 18px;
+      gap: 10px;
+    }
+    .status {
+      text-align: center;
+      font-size: 1.18rem;
+      font-weight: 800;
+      margin: 0 0 2px 0;
+      letter-spacing: 0.5px;
+    }
+    .status.ok {
+      color: #16a34a;
+    }
+    .status.bad {
+      color: #ef4444;
+    }
+    .main-buttons {
+      text-align: center;
+      margin: 0 0 0 0;
+    }
+    .main-buttons button {
+      margin: 0 8px;
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 22px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(124,58,237,0.12);
+      transition: background 0.2s;
+    }
+    .main-buttons button:hover {
+      background: #5b21b6;
+    }
+    .footer-note {
+      font-size: 1.05rem;
+      color: #94a3b8;
+      text-align: center;
+      background: rgba(124,58,237,0.06);
+      border-radius: 8px;
+      padding: 8px 0 4px 0;
+      font-weight: 500;
+      margin: 0 0 0 0;
+      width: 100%;
+      max-width: 1000px;
+    }
+    .footer-note b {
+      color: #7c3aed;
+      font-size: 1.08em;
+    }
+    #handBtn {
+      margin-top: 8px;
+      background: #fff;
+      color: #7c3aed;
+      border: 2px solid #7c3aed;
+      font-weight: 700;
+      padding: 8px 22px;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    #handBtn:hover {
+      background: #7c3aed;
+      color: #fff;
+    }
+    .mini-avatar-link {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      background: rgba(255,255,255,0.0);
+    }
+    .mini-avatar-img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 3px solid #7c3aed;
+      box-shadow: 0 2px 8px #0002;
+      background: #fff;
+      object-fit: cover;
+    }
+    .mini-avatar-name {
+      margin-left: 10px;
+      color: #7c3aed;
+      font-weight: 700;
+      font-size: 1.08rem;
+      text-shadow: 0 2px 8px #fff8;
+      background: rgba(255,255,255,0.7);
+      border-radius: 8px;
+      padding: 2px 10px;
+      display: none;
+    }
+    .mini-avatar-link:hover .mini-avatar-name {
+      display: inline-block;
+    }
+    @media (max-width: 1200px) {
+      .main-grid { grid-template-columns: 1fr 2fr; max-width: 100vw; }
+      .balance-canvas { width: 98vw; }
+      .footer-note { max-width: 98vw; }
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+      .painel-lateral { max-width: 98vw; min-width: 0; width: 98vw; margin-bottom: 12px; }
+      .main-content { width: 100vw; min-width: 0; }
+      .balance-canvas { width: 99vw; }
+      .footer-note { max-width: 99vw; }
+    }
+    @media (max-width: 700px) {
+      .container { padding: 0; }
+      .main-grid { padding: 0; }
+      .painel-lateral { padding: 10px 2vw; }
+      .controls-area { gap: 8px; }
+      .control-group { min-width: 0; max-width: 100vw; padding: 8px 2vw; }
+      .balance-canvas { height: 160px; }
+      .footer-note { font-size: 0.95rem; }
+      .mini-avatar-img { width: 44px; height: 44px; }
+      .mini-avatar-link { top: 8px; left: auto; right: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Avatar/miniaura no canto superior direito -->
+  <a href="https://www.instagram.com/profronaldo2025/" class="mini-avatar-link" target="_blank" title="Instagram Prof. Ronaldo" style="left: auto; right: 18px;">
+    <img src="avatar.png.gif" alt="Prof. Ronaldo" class="mini-avatar-img">
+    <span class="mini-avatar-name">Prof. Ronaldo</span>
+  </a>
+  <div class="container">
+    <div class="main-grid">
+      <!-- Painel lateral de explicação + sliders -->
+      <div class="painel-lateral" id="painelExplicacao">
+        <h2>Explicação Didática</h2>
+        <div id="torqueEsq" style="font-size:1.05rem;">Torque Esquerda = m₁ × d₁ = 100 × 10 = 1000</div>
+        <div id="torqueDir" style="font-size:1.05rem;">Torque Direita = m₂ × d₂ = 100 × 50 = 5000</div>
+        <div id="dica" class="dica"></div>
+        <div id="tutorialBox" class="tutorial">
+          <b>Tutorial de Gestos:</b>
+          <ul style="margin:8px 0 0 16px;padding:0;font-size:0.98rem;">
+            <li>Mão aberta: ajusta massa</li>
+            <li>Mão fechada: ajusta distância</li>
+            <li>Mão esquerda controla lado esquerdo, mão direita controla lado direito</li>
+            <li>Experimente os gestos antes de jogar!</li>
+          </ul>
+          <button id="fecharTutorial">Fechar Tutorial</button>
+        </div>
+        <button id="abrirTutorial">Ver Tutorial de Gestos</button>
+        <!-- Sliders abaixo da explicação didática -->
+        <div class="controls-area">
+          <div class="control-group">
+            <label for="leftMass">Massa Esquerda (g)</label>
+            <input type="range" id="leftMass" min="10" max="300" value="100" step="10">
+            <div class="value" id="leftMassVal">100g</div>
+            <label for="leftDist">Distância Esquerda (cm)</label>
+            <input type="range" id="leftDist" min="10" max="100" value="10" step="10">
+            <div class="value" id="leftDistVal">10cm</div>
+          </div>
+          <div class="control-group">
+            <label for="rightMass">Massa Direita (g)</label>
+            <input type="range" id="rightMass" min="10" max="300" value="100" step="10">
+            <div class="value" id="rightMassVal">100g</div>
+            <label for="rightDist">Distância Direita (cm)</label>
+            <input type="range" id="rightDist" min="10" max="100" value="50" step="10">
+            <div class="value" id="rightDistVal">50cm</div>
+          </div>
+        </div>
+      </div>
+      <!-- Fim painel lateral -->
+
+      <div class="main-content">
+        <h1>Equilíbrio</h1>
+        <div class="challenge" id="challengeText"></div>
+        <div class="simulador-area">
+          <!-- O vídeo da webcam fica oculto, mas é necessário para o controle por mão -->
+          <video id="video" width="320" height="180" autoplay muted style="display:none;"></video>
+          <canvas id="balanceCanvas" width="1000" height="320" class="balance-canvas"></canvas>
+          <!-- Overlay de parabéns -->
+          <div id="parabensOverlay" style="display:none; position:absolute; left:0; top:0; width:100vw; height:100vh; background:rgba(124,58,237,0.96); z-index:1000; align-items:center; justify-content:center; flex-direction:column;">
+            <div style="text-align:center;">
+              <span style="font-size:4rem; color:#fff; font-weight:900; text-shadow:0 4px 32px #000a;">🎉 Parabéns! 🎉</span>
+              <div style="font-size:2.2rem; color:#fff; margin-top:24px; font-weight:700;">Você atingiu o equilíbrio!</div>
+              <div id="tempoDiv" style="margin-top:32px; color:#fff; font-size:2rem; font-weight:700;"></div>
+              <div id="rankingDiv" style="margin-top:16px; color:#fff; font-size:1.2rem; text-align:center;"></div>
+              <div style="margin-top:40px;">
+                <button id="fecharParabens" style="font-size:1.3rem; background:#fff; color:#7c3aed; border:none; border-radius:12px; padding:16px 38px; font-weight:800; cursor:pointer; box-shadow:0 2px 16px #0002;">OK</button>
+              </div>
+            </div>
+          </div>
+          <div class="simulador-infos">
+            <div class="status" id="statusText"></div>
+            <div class="main-buttons">
+              <button id="newChallengeBtn">Novo Desafio</button>
+              <button id="resetBtn">Resetar</button>
+            </div>
+            <div class="footer-note">
+              Para equilibrar a balança, o produto da massa pela distância deve ser igual dos dois lados.<br>
+              <b>m₁ × d₁ = m₂ × d₂</b>
+            </div>
+            <button id="handBtn" class="ghost" style="margin-top:10px;">Ativar controle por mão</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script>
+    // Estado do jogo
+    let massaEsq = 100, massaDir = 100, distEsq = 10, distDir = 50;
+    let desafio = { massaDir: 100, distEsq: 10 };
+    let barraAngulo = 0, alvoAngulo = 0;
+    let interpLeftMass = 100, interpRightMass = 100, interpLeftDist = 10, interpRightDist = 50;
+
+    // Elementos
+    const leftMass = document.getElementById('leftMass');
+    const rightMass = document.getElementById('rightMass');
+    const leftDist = document.getElementById('leftDist');
+    const rightDist = document.getElementById('rightDist');
+    const leftMassVal = document.getElementById('leftMassVal');
+    const rightMassVal = document.getElementById('rightMassVal');
+    const leftDistVal = document.getElementById('leftDistVal');
+    const rightDistVal = document.getElementById('rightDistVal');
+    const statusText = document.getElementById('statusText');
+    const challengeText = document.getElementById('challengeText');
+    const canvas = document.getElementById('balanceCanvas');
+    const ctx = canvas.getContext('2d');
+    const video = document.getElementById('video');
+    const painelExplicacao = document.getElementById('painelExplicacao');
+    const torqueEsqDiv = document.getElementById('torqueEsq');
+    const torqueDirDiv = document.getElementById('torqueDir');
+    const dicaDiv = document.getElementById('dica');
+    const tutorialBox = document.getElementById('tutorialBox');
+    const abrirTutorial = document.getElementById('abrirTutorial');
+    const fecharTutorial = document.getElementById('fecharTutorial');
+    const handBtn = document.getElementById('handBtn');
+    const newChallengeBtn = document.getElementById('newChallengeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const parabensOverlay = document.getElementById('parabensOverlay');
+    const fecharParabens = document.getElementById('fecharParabens');
+    const tempoDiv = document.getElementById('tempoDiv');
+    const rankingDiv = document.getElementById('rankingDiv');
+
+    let handControlActive = false;
+    let hands = null;
+    let camera = null;
+    let handResultsGlobal = [];
+    let equilibrioTravado = false;
+    let startTime = null;
+    let endTime = null;
+    let ranking = [];
+
+    // Tutorial de gestos
+    abrirTutorial.onclick = () => { tutorialBox.style.display = "block"; };
+    fecharTutorial.onclick = () => { tutorialBox.style.display = "none"; };
+
+    // Inicializa MediaPipe Hands
+    function initHandTracking() {
+      video.style.display = "none"; // Mantém o vídeo oculto, mas funcional
+      if (!hands) {
+        hands = new Hands({
+          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+        hands.setOptions({
+          maxNumHands: 2,
+          modelComplexity: 1,
+          minDetectionConfidence: 0.7,
+          minTrackingConfidence: 0.7
+        });
+        hands.onResults(onHandResults);
+      }
+      if (!camera) {
+        camera = new Camera(video, {
+          onFrame: async () => {
+            if (handControlActive) {
+              await hands.send({image: video});
+            }
+          },
+          width: 320,
+          height: 180
+        });
+      }
+      camera.start();
+    }
+
+    function stopHandTracking() {
+      if (camera) camera.stop();
+      video.style.display = "none";
+    }
+
+    handBtn.addEventListener('click', () => {
+      handControlActive = !handControlActive;
+      handBtn.textContent = handControlActive ? 'Desativar controle por mão' : 'Ativar controle por mão';
+      if (handControlActive) {
+        initHandTracking();
+      } else {
+        stopHandTracking();
+      }
+    });
+
+    function destravarSliders() {
+      leftMass.disabled = false;
+      rightMass.disabled = false;
+      leftDist.disabled = false;
+      rightDist.disabled = false;
+      equilibrioTravado = false;
+      handBtn.textContent = handControlActive ? "Desativar controle por mão" : "Ativar controle por mão";
+      parabensOverlay.style.display = "none";
+    }
+
+    // Melhor UX: sliders não "pulam" ao serem usados manualmente
+    let sliderLock = {leftMass: false, rightMass: false, leftDist: false, rightDist: false};
+
+    function lockSlider(name) {
+      sliderLock[name] = true;
+      setTimeout(() => sliderLock[name] = false, 800);
+    }
+
+    leftMass.addEventListener('input', () => {
+      lockSlider('leftMass');
+      interpLeftMass = parseInt(leftMass.value);
+      updateUI();
+    });
+    rightMass.addEventListener('input', () => {
+      lockSlider('rightMass');
+      interpRightMass = parseInt(rightMass.value);
+      updateUI();
+    });
+    leftDist.addEventListener('input', () => {
+      lockSlider('leftDist');
+      interpLeftDist = parseInt(leftDist.value);
+      updateUI();
+    });
+    rightDist.addEventListener('input', () => {
+      lockSlider('rightDist');
+      interpRightDist = parseInt(rightDist.value);
+      updateUI();
+    });
+
+    function onHandResults(results) {
+      if (equilibrioTravado) return;
+      handResultsGlobal = results.multiHandLandmarks ? results.multiHandLandmarks.map((l, i) => ({
+        landmarks: l,
+        handedness: results.multiHandedness[i].label,
+        closed: isHandClosed(l)
+      })) : [];
+      let targetLeftMass = massaEsq, targetRightMass = massaDir, targetLeftDist = distEsq, targetRightDist = distDir;
+      handResultsGlobal.forEach(handObj => {
+        const hand = handObj.landmarks;
+        const handedness = handObj.handedness;
+        const x = hand[9].x;
+        const y = hand[9].y;
+        const closed = handObj.closed;
+        if (handedness === "Left") {
+          if (!closed) {
+            let val = 10 + Math.round(x * 29) * 10;
+            targetLeftMass = Math.max(10, Math.min(300, val));
+          } else {
+            let val = 10 + Math.round((1 - y) * 9) * 10;
+            targetLeftDist = Math.max(10, Math.min(100, val));
+          }
+        } else if (handedness === "Right") {
+          if (!closed) {
+            let val = 10 + Math.round(x * 29) * 10;
+            targetRightMass = Math.max(10, Math.min(300, val));
+          } else {
+            let val = 10 + Math.round((1 - y) * 9) * 10;
+            targetRightDist = Math.max(10, Math.min(100, val));
+          }
+        }
+      });
+      if (!sliderLock.leftMass) interpLeftMass += (targetLeftMass - interpLeftMass) * 0.5;
+      if (!sliderLock.rightMass) interpRightMass += (targetRightMass - interpRightMass) * 0.5;
+      if (!sliderLock.leftDist) interpLeftDist += (targetLeftDist - interpLeftDist) * 0.5;
+      if (!sliderLock.rightDist) interpRightDist += (targetRightDist - interpRightDist) * 0.5;
+      if (!sliderLock.leftMass) leftMass.value = Math.round(interpLeftMass / 10) * 10;
+      if (!sliderLock.rightMass) rightMass.value = Math.round(interpRightMass / 10) * 10;
+      if (!sliderLock.leftDist) leftDist.value = Math.round(interpLeftDist / 10) * 10;
+      if (!sliderLock.rightDist) rightDist.value = Math.round(interpRightDist / 10) * 10;
+      updateUI();
+    }
+
+    function isHandClosed(landmarks) {
+      const dx = landmarks[8].x - landmarks[0].x;
+      const dy = landmarks[8].y - landmarks[0].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      return dist < 0.13;
+    }
+
+    leftDist.min = rightDist.min = 10;
+    leftDist.max = rightDist.max = 100;
+    leftDist.step = rightDist.step = 10;
+    leftMass.step = rightMass.step = 10;
+
+    function travarSliders() {
+      leftMass.disabled = true;
+      rightMass.disabled = true;
+      leftDist.disabled = true;
+      rightDist.disabled = true;
+      handControlActive = false;
+      equilibrioTravado = true;
+      handBtn.textContent = "Controle travado";
+      stopHandTracking();
+      endTime = Date.now();
+      let tempo = ((endTime - startTime) / 1000).toFixed(2);
+      tempoDiv.innerHTML = `⏱️ Seu tempo: <b>${tempo}s</b>`;
+      ranking.push(Number(tempo));
+      ranking.sort((a, b) => a - b);
+      let top5 = ranking.slice(0, 5);
+      let html = "<b>Ranking dos melhores tempos:</b><br>";
+      top5.forEach((t, i) => {
+        html += `${i + 1}º - ${t.toFixed(2)}s<br>`;
+      });
+      rankingDiv.innerHTML = html;
+      parabensOverlay.style.display = "flex";
+    }
+
+    function verificarEquilibrio() {
+      const torqueEsq = massaEsq * distEsq;
+      const torqueDir = massaDir * distDir;
+      const tolerancia = 2;
+      if (Math.abs(torqueEsq - torqueDir) <= tolerancia) {
+        statusText.textContent = "🎉 Equilíbrio perfeito! Parabéns!";
+        statusText.className = "status ok";
+        alvoAngulo = 0;
+        if (!equilibrioTravado) {
+          travarSliders();
+        }
+      } else if (torqueEsq > torqueDir) {
+        statusText.textContent = "Inclinado para a esquerda";
+        statusText.className = "status bad";
+        alvoAngulo = Math.max(-18, -Math.abs((torqueEsq-torqueDir)/Math.max(torqueEsq,1)*12));
+      } else {
+        statusText.textContent = "Inclinado para a direita";
+        statusText.className = "status bad";
+        alvoAngulo = Math.min(18, Math.abs((torqueDir-torqueEsq)/Math.max(torqueDir,1)*12));
+      }
+    }
+
+    fecharParabens.onclick = () => {
+      parabensOverlay.style.display = "none";
+    };
+
+    function novoDesafio() {
+      desafio.massaDir = [50,100,150,200,250][Math.floor(Math.random()*5)];
+      desafio.distEsq = [5,10,15,20,25,30][Math.floor(Math.random()*6)];
+      rightMass.value = desafio.massaDir;
+      leftDist.value = desafio.distEsq;
+      massaDir = desafio.massaDir;
+      distEsq = desafio.distEsq;
+      leftMass.value = 100;
+      rightDist.value = 50;
+      massaEsq = 100;
+      distDir = 50;
+      interpLeftMass = 100;
+      interpRightMass = 100;
+      interpLeftDist = 10;
+      interpRightDist = 50;
+      destravarSliders();
+      updateUI();
+      challengeText.textContent = `Desafio: Massa Direita = ${desafio.massaDir}g, Distância Esquerda = ${desafio.distEsq}cm. Ajuste os outros valores para equilibrar!`;
+      startTime = Date.now();
+      endTime = null;
+    }
+
+    function resetar() {
+      leftMass.value = 100;
+      rightMass.value = 100;
+      leftDist.value = 10;
+      rightDist.value = 50;
+      massaEsq = 100;
+      massaDir = 100;
+      distEsq = 10;
+      distDir = 50;
+      interpLeftMass = 100;
+      interpRightMass = 100;
+      interpLeftDist = 10;
+      interpRightDist = 50;
+      destravarSliders();
+      updateUI();
+      challengeText.textContent = "Ajuste os valores para equilibrar a balança!";
+      startTime = Date.now();
+      endTime = null;
+    }
+
+    newChallengeBtn.addEventListener('click', novoDesafio);
+    resetBtn.addEventListener('click', resetar);
+
+    function updateUI() {
+      massaEsq = parseInt(leftMass.value);
+      massaDir = parseInt(rightMass.value);
+      distEsq = parseInt(leftDist.value);
+      distDir = parseInt(rightDist.value);
+      leftMassVal.textContent = massaEsq + "g";
+      rightMassVal.textContent = massaDir + "g";
+      leftDistVal.textContent = distEsq + "cm";
+      rightDistVal.textContent = distDir + "cm";
+      torqueEsqDiv.textContent = `Torque Esquerda = m₁ × d₁ = ${massaEsq} × ${distEsq} = ${massaEsq*distEsq}`;
+      torqueDirDiv.textContent = `Torque Direita = m₂ × d₂ = ${massaDir} × ${distDir} = ${massaDir*distDir}`;
+      const diff = Math.abs(massaEsq*distEsq - massaDir*distDir);
+      if (diff > 1000) {
+        dicaDiv.style.display = "block";
+        if (massaEsq*distEsq < massaDir*distDir) {
+          dicaDiv.textContent = "Dica: Aumente a massa ou distância do lado esquerdo, ou diminua do lado direito.";
+        } else {
+          dicaDiv.textContent = "Dica: Aumente a massa ou distância do lado direito, ou diminua do lado esquerdo.";
+        }
+      } else if (diff > 100) {
+        dicaDiv.style.display = "block";
+        dicaDiv.textContent = "Você está quase lá! Ajuste pequenos valores para equilibrar.";
+      } else {
+        dicaDiv.style.display = "none";
+      }
+      verificarEquilibrio();
+      animarBarra();
+    }
+
+    function animarBarra() {
+      let passo = (alvoAngulo - barraAngulo) / 8;
+      if (Math.abs(passo) > 0.2) {
+        barraAngulo += passo;
+        desenharBalanca();
+        setTimeout(animarBarra, 20);
+      } else {
+        barraAngulo = alvoAngulo;
+        desenharBalanca();
+      }
+    }
+
+    function desenharBalanca() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.save();
+      ctx.strokeStyle = "#bdbdbd";
+      ctx.setLineDash([8, 8]);
+      ctx.lineWidth = 3;
+      const barraTotal = 600;
+      const yBarra = 170;
+      const xEsq = 100;
+      const xDir = xEsq + barraTotal;
+      ctx.beginPath();
+      ctx.moveTo(xEsq, yBarra);
+      ctx.lineTo(xDir, yBarra);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      const totalDist = distEsq + distDir;
+      const xFulcro = xEsq + (distEsq / totalDist) * barraTotal;
+      const barraComprimento = xDir - xEsq;
+      const angRad = barraAngulo * Math.PI / 180;
+      const dy = Math.tan(angRad) * (barraComprimento)/2;
+
+      ctx.save();
+      ctx.fillStyle = "#7c3aed";
+      ctx.beginPath();
+      ctx.moveTo(xFulcro - 10, yBarra + 50);
+      ctx.lineTo(xFulcro + 10, yBarra + 50);
+      ctx.lineTo(xFulcro, yBarra + 10);
+      ctx.closePath();
+      ctx.shadowColor = "#7c3aed";
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(xFulcro, yBarra);
+      ctx.rotate(angRad);
+      ctx.strokeStyle = (barraAngulo === 0) ? "#16a34a" : "#ef4444";
+      ctx.lineWidth = 22;
+      ctx.beginPath();
+      ctx.moveTo(xEsq - xFulcro, -dy);
+      ctx.lineTo(xDir - xFulcro, +dy);
+      ctx.stroke();
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = "#e0e7ef";
+      ctx.beginPath();
+      ctx.moveTo(xEsq - xFulcro + 10, -dy - 2);
+      ctx.lineTo(xDir - xFulcro - 10, +dy + 2);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.shadowColor = "#aaa";
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = "#f3f3f3";
+      ctx.strokeStyle = "#bdbdbd";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(xEsq, yBarra-dy, 48, 0, 2*Math.PI);
+      ctx.arc(xDir, yBarra+dy, 48, 0, 2*Math.PI);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.shadowColor = "#7c3aed";
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = "#7c3aed";
+      ctx.beginPath();
+      ctx.arc(xEsq, yBarra-dy, 26, 0, 2*Math.PI);
+      ctx.arc(xDir, yBarra+dy, 26, 0, 2*Math.PI);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = "#222";
+      ctx.font = "bold 22px Inter";
+      ctx.textAlign = "center";
+      ctx.fillText(massaEsq+"g", xEsq, yBarra-dy+60);
+      ctx.fillText(massaDir+"g", xDir, yBarra+dy+60);
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = "#7c3aed";
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.moveTo(xFulcro, yBarra);
+      ctx.lineTo(xFulcro, 320);
+      ctx.stroke();
+      ctx.restore();
+
+      if (handResultsGlobal && handResultsGlobal.length > 0) {
+        handResultsGlobal.forEach(handObj => {
+          const hand = handObj.landmarks;
+          const closed = handObj.closed;
+          ctx.save();
+          ctx.globalAlpha = 0.8;
+          ctx.strokeStyle = closed ? "#ef4444" : "#16a34a";
+          ctx.lineWidth = 4;
+          const fingers = [
+            [0,1,2,3,4],
+            [0,5,6,7,8],
+            [0,9,10,11,12],
+            [0,13,14,15,16],
+            [0,17,18,19,20]
+          ];
+          fingers.forEach(finger => {
+            ctx.beginPath();
+            ctx.moveTo(hand[finger[0]].x*canvas.width, hand[finger[0]].y*canvas.height);
+            for (let i=1;i<finger.length;i++) {
+              ctx.lineTo(hand[finger[i]].x*canvas.width, hand[finger[i]].y*canvas.height);
+            }
+            ctx.stroke();
+          });
+          ctx.beginPath();
+          ctx.arc(hand[0].x*canvas.width, hand[0].y*canvas.height, 18, 0, 2*Math.PI);
+          ctx.strokeStyle = closed ? "#ef4444" : "#16a34a";
+          ctx.lineWidth = 5;
+          ctx.stroke();
+          ctx.restore();
+        });
+      }
+    }
+
+    function animationLoop() {
+      updateUI();
+      requestAnimationFrame(animationLoop);
+    }
+    animationLoop();
+
+    novoDesafio();
+  </script>
+</body>
+</html>
